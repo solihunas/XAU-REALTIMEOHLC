@@ -8,22 +8,22 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
-  --bg:         #0a0c0f;
-  --panel:      #111318;
-  --panel2:     #13161d;
-  --border:     #1e2330;
-  --gold:       #c9a84c;
-  --gold-bright:#f0c040;
-  --gold-dim:   #7a6130;
-  --gold-glow:  rgba(201,168,76,0.12);
-  --green:      #2ecc71;
-  --red:        #e74c3c;
-  --text:       #cdd3e0;
-  --muted:      #4a5268;
-  --mono:       'Share Tech Mono', monospace;
+  --bg:          #0a0c0f;
+  --panel:       #111318;
+  --panel2:      #13161d;
+  --border:      #1e2330;
+  --gold:        #c9a84c;
+  --gold-bright: #f0c040;
+  --gold-dim:    #7a6130;
+  --gold-glow:   rgba(201,168,76,0.1);
+  --green:       #2ecc71;
+  --red:         #e74c3c;
+  --text:        #cdd3e0;
+  --muted:       #4a5268;
+  --mono:        'Share Tech Mono', monospace;
 }
 
 body {
@@ -32,7 +32,7 @@ body {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   padding: 12px;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -42,8 +42,8 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 10px;
   padding: 14px 16px;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -51,29 +51,30 @@ body {
   border-radius: 8px;
 }
 
-.symbol-block { display: flex; align-items: center; gap: 14px; }
+.symbol-block { display: flex; align-items: center; gap: 12px; }
 
 .gold-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, #c9a84c, #f0c040, #c9a84c);
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, #c9a84c, #f0c040, #a07820);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; color: #0a0c0f;
+  font-size: 13px; font-weight: 700; color: #0a0c0f;
   flex-shrink: 0;
-  box-shadow: 0 0 10px rgba(201,168,76,0.3);
+  box-shadow: 0 0 12px rgba(201,168,76,0.3);
 }
 
-.symbol { font-family: var(--mono); font-size: 18px; color: var(--gold-bright); letter-spacing: 2px; }
-.sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.symbol    { font-family: var(--mono); font-size: 18px; color: var(--gold-bright); letter-spacing: 2px; }
+.sub       { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
 .price-block { text-align: right; }
 
 #livePrice {
   font-family: var(--mono);
-  font-size: 28px;
+  font-size: 30px;
   color: var(--gold-bright);
   letter-spacing: 1px;
   line-height: 1;
+  transition: color 0.4s;
 }
 
 #priceChange {
@@ -88,7 +89,7 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 10px;
   padding: 6px 10px;
   background: var(--panel2);
@@ -101,32 +102,28 @@ body {
 
 .status-left { display: flex; align-items: center; gap: 6px; }
 
-.dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--muted);
-  flex-shrink: 0;
-}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
 .dot.live    { background: var(--green); box-shadow: 0 0 5px var(--green); }
 .dot.loading { background: var(--gold);  animation: pulse 0.9s ease-in-out infinite; }
 .dot.error   { background: var(--red); }
 
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
 /* ── Error box ───────────────────────────── */
 .error-box {
-  background: rgba(231,76,60,0.08);
+  background: rgba(231,76,60,0.07);
   border: 1px solid rgba(231,76,60,0.3);
   border-radius: 6px;
   padding: 10px 14px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--red);
   font-family: var(--mono);
   margin-bottom: 10px;
+  line-height: 1.7;
   display: none;
 }
 
-/* ── Chart sections ──────────────────────── */
+/* ── Chart section ───────────────────────── */
 .chart-section {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -141,13 +138,13 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 9px 14px;
+  gap: 6px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--border);
   background: var(--panel2);
 }
 
-.chart-header-left { display: flex; align-items: center; gap: 12px; }
+.chart-header-left { display: flex; align-items: center; gap: 10px; }
 
 .tf-label {
   font-family: var(--mono);
@@ -162,8 +159,8 @@ body {
   color: var(--muted);
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 2px 7px;
+  border-radius: 3px;
+  padding: 2px 6px;
 }
 
 .ohlc-info {
@@ -179,7 +176,7 @@ body {
 .ohlc-info .l { color: var(--red); }
 .ohlc-info .c { color: var(--gold-bright); }
 
-/* Countdown badge */
+/* countdown */
 .countdown {
   font-family: var(--mono);
   font-size: 10px;
@@ -190,30 +187,30 @@ body {
   white-space: nowrap;
 }
 
-.countdown-bar-wrap {
-  width: 60px;
-  height: 3px;
+.cd-bar-wrap {
+  width: 55px; height: 3px;
   background: var(--border);
   border-radius: 2px;
   overflow: hidden;
 }
 
-.countdown-bar {
+.cd-bar {
   height: 100%;
   background: var(--gold-dim);
   border-radius: 2px;
   transition: width 1s linear;
 }
 
-/* Chart canvas */
-.chart-box { width: 100%; height: 250px; }
+/* chart boxes */
+.chart-box { width: 100%; height: 240px; }
+.vol-box   { width: 100%; height: 55px; }
 
-/* Last price row */
+/* last price row */
 .last-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 14px;
+  padding: 6px 12px;
   border-top: 1px solid var(--border);
 }
 
@@ -228,23 +225,15 @@ body {
   font-size: 11px;
   color: var(--muted);
   display: flex;
-  gap: 10px;
+  gap: 9px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-/* Volume chart box */
-.vol-box { width: 100%; height: 60px; }
-
 /* ── Controls ────────────────────────────── */
-.controls {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-
 .refresh-btn {
-  flex: 1;
+  display: block;
+  width: 100%;
   padding: 10px;
   background: transparent;
   border: 1px solid var(--gold-dim);
@@ -256,6 +245,7 @@ body {
   cursor: pointer;
   text-transform: uppercase;
   transition: all 0.2s;
+  margin-top: 4px;
 }
 .refresh-btn:hover:not(:disabled) { background: var(--gold-glow); border-color: var(--gold); }
 .refresh-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -266,134 +256,117 @@ body {
   color: var(--muted);
   margin-top: 8px;
   font-family: var(--mono);
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
-/* ── Responsive ──────────────────────────── */
 @media (max-width: 480px) {
   #livePrice { font-size: 22px; }
-  .chart-box  { height: 200px; }
-  .vol-box    { height: 48px; }
-  .ohlc-info  { display: none; }
+  .chart-box { height: 200px; }
+  .vol-box   { height: 44px; }
+  .ohlc-info { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- ── Header ─────────────────────── -->
+<!-- ── Header ─────────────────────────── -->
 <div class="header">
   <div class="symbol-block">
     <div class="gold-icon">Au</div>
     <div>
       <div class="symbol">XAU / USD</div>
-      <div class="sub">Gold Spot · Twelve Data · Auto-refresh</div>
+      <div class="sub">Gold Futures · Yahoo Finance · GC=F · Auto-refresh</div>
     </div>
   </div>
   <div class="price-block">
     <div id="livePrice">–</div>
     <div id="priceChange" style="color:var(--muted)">– –</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px" id="updateTime">–</div>
+    <div id="updateTime" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">–</div>
   </div>
 </div>
 
-<!-- ── Status bar ─────────────────── -->
+<!-- ── Status ──────────────────────────── -->
 <div class="status-bar">
   <div class="status-left">
     <div class="dot loading" id="statusDot"></div>
-    <span id="statusText">Initializing...</span>
+    <span id="statusText">Menghubungkan ke Yahoo Finance...</span>
   </div>
-  <span id="apiInfo" style="font-size:10px">Twelve Data · Basic plan</span>
+  <span id="apiInfo" style="font-size:10px">Yahoo Finance · No API key</span>
 </div>
 
-<!-- ── Error ──────────────────────── -->
+<!-- ── Error ───────────────────────────── -->
 <div class="error-box" id="errorBox"></div>
 
-<!-- ── M15 Chart ──────────────────── -->
+<!-- ── M15 ────────────────────────────── -->
 <div class="chart-section">
   <div class="chart-header">
     <div class="chart-header-left">
       <div class="tf-label">M15</div>
-      <div class="candle-count" id="m15count">100 candles</div>
+      <div class="candle-count" id="m15count">– candles</div>
       <div class="ohlc-info" id="m15info"><span style="color:var(--muted)">Arahkan ke candle</span></div>
     </div>
-    <div class="countdown" id="m15countdown">
+    <div class="countdown">
       <span id="m15cdText">–</span>
-      <div class="countdown-bar-wrap"><div class="countdown-bar" id="m15bar" style="width:100%"></div></div>
+      <div class="cd-bar-wrap"><div class="cd-bar" id="m15bar" style="width:100%"></div></div>
     </div>
   </div>
   <div class="chart-box" id="m15chart"></div>
-  <div class="vol-box" id="m15vol"></div>
+  <div class="vol-box"   id="m15vol"></div>
   <div class="last-row">
     <div class="last-price" id="m15last">–</div>
-    <div class="last-ohlc" id="m15lastOhlc"></div>
+    <div class="last-ohlc"  id="m15lastOhlc"></div>
   </div>
 </div>
 
-<!-- ── H4 Chart ───────────────────── -->
+<!-- ── H4 ─────────────────────────────── -->
 <div class="chart-section">
   <div class="chart-header">
     <div class="chart-header-left">
       <div class="tf-label">H4</div>
-      <div class="candle-count" id="h4count">50 candles</div>
+      <div class="candle-count" id="h4count">– candles</div>
       <div class="ohlc-info" id="h4info"><span style="color:var(--muted)">Arahkan ke candle</span></div>
     </div>
-    <div class="countdown" id="h4countdown">
+    <div class="countdown">
       <span id="h4cdText">–</span>
-      <div class="countdown-bar-wrap"><div class="countdown-bar" id="h4bar" style="width:100%"></div></div>
+      <div class="cd-bar-wrap"><div class="cd-bar" id="h4bar" style="width:100%"></div></div>
     </div>
   </div>
   <div class="chart-box" id="h4chart"></div>
-  <div class="vol-box" id="h4vol"></div>
+  <div class="vol-box"   id="h4vol"></div>
   <div class="last-row">
     <div class="last-price" id="h4last">–</div>
-    <div class="last-ohlc" id="h4lastOhlc"></div>
+    <div class="last-ohlc"  id="h4lastOhlc"></div>
   </div>
 </div>
 
-<!-- ── Controls ───────────────────── -->
-<div class="controls">
-  <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">&#8635; &nbsp;Refresh Sekarang</button>
-</div>
+<!-- ── Controls ────────────────────────── -->
+<button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">&#8635; &nbsp;Refresh Sekarang</button>
 <div class="note">
-  Twelve Data · Basic · 800 req/day &nbsp;|&nbsp; M15 refresh: 3 menit &nbsp;|&nbsp; H4 refresh: 30 menit<br>
-  Data mungkin delay 15 menit pada plan gratis
+  Yahoo Finance · No API key · GC=F (Gold Futures)<br>
+  M15 refresh: 5 menit &nbsp;|&nbsp; H4 refresh: 30 menit &nbsp;|&nbsp; H4 = grouped dari 1H candles
 </div>
 
 <script>
 // ── Config ────────────────────────────────────────────────
-const API_KEY    = '78bbb1cff5b947328967d98b25ed1ffd';
-const M15_INTERVAL_MS = 3  * 60 * 1000;  // 3 minutes
-const H4_INTERVAL_MS  = 30 * 60 * 1000;  // 30 minutes
+const SYMBOL          = 'GC=F';
+const M15_REFRESH_MS  = 5  * 60 * 1000;
+const H4_REFRESH_MS   = 30 * 60 * 1000;
+
+// CORS proxies tried in order
+const PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => u, // direct (usually blocked by CORS, fallback)
+];
 
 // ── State ─────────────────────────────────────────────────
-let m15Chart, m15Series, m15VolSeries;
-let h4Chart,  h4Series,  h4VolSeries;
-let m15Timer, h4Timer;
+let m15Chart, m15Series, m15VolChart, m15VolSeries;
+let h4Chart,  h4Series,  h4VolChart,  h4VolSeries;
+let m15Timer, h4Timer, cdTick;
 let m15NextAt = 0, h4NextAt = 0;
-let cdTick;
 
 // ── Helpers ───────────────────────────────────────────────
-function fmt(n, d = 2) {
-  return n != null ? Number(n).toFixed(d) : '–';
-}
-
-function fmtTime(ts) {
-  return new Date(ts * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-}
-
-function fmtDateTime(ts) {
-  return new Date(ts * 1000).toLocaleString('id-ID', {
-    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-  });
-}
-
-function fmtCountdown(ms) {
-  if (ms <= 0) return '00:00';
-  const s = Math.ceil(ms / 1000);
-  const m = Math.floor(s / 60);
-  const ss = s % 60;
-  return `${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
-}
+const fmt = (n, d = 2) => (n != null && !isNaN(n)) ? Number(n).toFixed(d) : '–';
 
 function setStatus(type, msg) {
   document.getElementById('statusDot').className = 'dot ' + type;
@@ -406,325 +379,310 @@ function setError(msg) {
   el.textContent = msg;
 }
 
-// ── Chart init ────────────────────────────────────────────
-function makeChart(elId, volElId) {
-  const el = document.getElementById(elId);
-  const vEl = document.getElementById(volElId);
+function fmtCountdown(ms) {
+  if (ms <= 0) return '00:00';
+  const s = Math.ceil(ms / 1000);
+  return String(Math.floor(s / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
+}
 
-  const chart = LightweightCharts.createChart(el, {
-    width: el.offsetWidth,
-    height: 250,
-    layout: {
-      background: { color: '#111318' },
-      textColor: '#4a5268',
-    },
-    grid: {
-      vertLines: { color: '#15192200' },
-      horzLines: { color: '#1a1e2870' },
-    },
+// ── Yahoo Finance ─────────────────────────────────────────
+function buildUrl(interval, range) {
+  return `https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOL}` +
+    `?interval=${interval}&range=${range}&includePrePost=false&corsDomain=finance.yahoo.com`;
+}
+
+async function fetchWithProxy(url) {
+  let lastErr;
+  for (const mkProxy of PROXIES) {
+    try {
+      const res = await fetch(mkProxy(url), {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(9000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return data.contents ? JSON.parse(data.contents) : data;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr;
+}
+
+function parseYahoo(data, count) {
+  const r = data?.chart?.result?.[0];
+  if (!r) throw new Error('No chart data in response');
+  const ts = r.timestamp;
+  const q  = r.indicators?.quote?.[0];
+  if (!ts || !q) throw new Error('Missing OHLC arrays');
+
+  const out = [];
+  for (let i = 0; i < ts.length; i++) {
+    if (q.open[i] == null || q.high[i] == null || q.low[i] == null || q.close[i] == null) continue;
+    out.push({
+      time:   ts[i],
+      open:   q.open[i],
+      high:   q.high[i],
+      low:    q.low[i],
+      close:  q.close[i],
+      volume: q.volume?.[i] ?? 0,
+    });
+  }
+  return out.slice(-count);
+}
+
+// Group 1H candles → 4H candles
+function groupTo4H(h1) {
+  const g = {};
+  for (const c of h1) {
+    const d = new Date(c.time * 1000);
+    d.setUTCMinutes(0, 0, 0);
+    d.setUTCHours(Math.floor(d.getUTCHours() / 4) * 4);
+    const k = Math.floor(d.getTime() / 1000);
+    if (!g[k]) {
+      g[k] = { time: k, open: c.open, high: c.high, low: c.low, close: c.close, volume: c.volume };
+    } else {
+      g[k].high   = Math.max(g[k].high, c.high);
+      g[k].low    = Math.min(g[k].low,  c.low);
+      g[k].close  = c.close;
+      g[k].volume = (g[k].volume ?? 0) + (c.volume ?? 0);
+    }
+  }
+  return Object.values(g).sort((a, b) => a.time - b.time);
+}
+
+// ── Chart init ────────────────────────────────────────────
+function makeChart(canvasId, volId) {
+  const el  = document.getElementById(canvasId);
+  const vEl = document.getElementById(volId);
+
+  const BASE_OPTS = {
+    layout: { background: { color: '#111318' }, textColor: '#4a5268' },
+    grid:   { vertLines: { color: '#15181f' }, horzLines: { color: '#1a1e28' } },
     crosshair: {
       mode: 1,
-      vertLine: { color: '#c9a84c55', labelBackgroundColor: '#c9a84c' },
-      horzLine: { color: '#c9a84c55', labelBackgroundColor: '#c9a84c' },
+      vertLine: { color: '#c9a84c44', labelBackgroundColor: '#c9a84c' },
+      horzLine: { color: '#c9a84c44', labelBackgroundColor: '#c9a84c' },
     },
-    rightPriceScale: {
-      borderColor: '#1e2330',
-      textColor: '#4a5268',
-    },
-    timeScale: {
-      borderColor: '#1e2330',
-      timeVisible: true,
-      secondsVisible: false,
-      fixLeftEdge: false,
-    },
+    rightPriceScale: { borderColor: '#1e2330', textColor: '#4a5268' },
+    timeScale: { borderColor: '#1e2330', timeVisible: true, secondsVisible: false },
     handleScroll: true,
     handleScale: true,
-  });
+  };
 
-  const candleSeries = chart.addCandlestickSeries({
-    upColor:        '#2ecc71',
-    downColor:      '#e74c3c',
-    borderUpColor:  '#2ecc71',
-    borderDownColor:'#e74c3c',
-    wickUpColor:    '#2ecc71',
-    wickDownColor:  '#e74c3c',
-  });
+  const CANDLE_OPTS = {
+    upColor: '#2ecc71', downColor: '#e74c3c',
+    borderUpColor: '#2ecc71', borderDownColor: '#e74c3c',
+    wickUpColor: '#2ecc71', wickDownColor: '#e74c3c',
+  };
 
-  // Volume chart
+  const chart = LightweightCharts.createChart(el, { ...BASE_OPTS, width: el.offsetWidth, height: 240 });
+  const series = chart.addCandlestickSeries(CANDLE_OPTS);
+
   const volChart = LightweightCharts.createChart(vEl, {
-    width: vEl.offsetWidth,
-    height: 60,
+    width: vEl.offsetWidth, height: 55,
     layout: { background: { color: '#111318' }, textColor: 'transparent' },
-    grid: { vertLines: { color: 'transparent' }, horzLines: { color: 'transparent' } },
+    grid:   { vertLines: { color: 'transparent' }, horzLines: { color: 'transparent' } },
     rightPriceScale: { visible: false },
     leftPriceScale:  { visible: false },
     timeScale: { visible: false },
     crosshair: { horzLine: { visible: false }, vertLine: { visible: false } },
-    handleScroll: false,
-    handleScale: false,
+    handleScroll: false, handleScale: false,
   });
 
   const volSeries = volChart.addHistogramSeries({
-    color: '#c9a84c30',
+    color: '#c9a84c28',
     priceFormat: { type: 'volume' },
     priceScaleId: '',
   });
-  volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 } });
+  volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.05, bottom: 0 } });
 
-  // Sync vol chart scroll/scale with main chart
+  // Sync volume chart x-axis with main chart
   chart.timeScale().subscribeVisibleTimeRangeChange(() => {
     try {
-      const range = chart.timeScale().getVisibleRange();
-      if (range) volChart.timeScale().setVisibleRange(range);
+      const r = chart.timeScale().getVisibleRange();
+      if (r) volChart.timeScale().setVisibleRange(r);
     } catch (_) {}
   });
 
-  return { chart, candleSeries, volSeries, volChart, el, vEl };
+  // Resize observer
+  const obs = new ResizeObserver(() => {
+    chart.applyOptions({ width: el.offsetWidth });
+    volChart.applyOptions({ width: vEl.offsetWidth });
+  });
+  obs.observe(el);
+
+  return { chart, series, volChart, volSeries };
 }
 
 function initCharts() {
-  const m15 = makeChart('m15chart', 'm15vol');
-  m15Chart = m15.chart; m15Series = m15.candleSeries; m15VolSeries = m15.volSeries;
+  ({ chart: m15Chart, series: m15Series, volChart: m15VolChart, volSeries: m15VolSeries } = makeChart('m15chart', 'm15vol'));
+  ({ chart: h4Chart,  series: h4Series,  volChart: h4VolChart,  volSeries: h4VolSeries  } = makeChart('h4chart',  'h4vol'));
 
-  const h4 = makeChart('h4chart', 'h4vol');
-  h4Chart = h4.chart; h4Series = h4.candleSeries; h4VolSeries = h4.volSeries;
-
-  // OHLC hover
   m15Chart.subscribeCrosshairMove(p => {
-    if (p.seriesData && p.seriesData.size > 0) {
-      const d = p.seriesData.get(m15Series);
-      if (d) updateOHLCInfo('m15info', d);
-    }
+    if (p.seriesData?.size) { const d = p.seriesData.get(m15Series); if (d) showOHLC('m15info', d); }
   });
   h4Chart.subscribeCrosshairMove(p => {
-    if (p.seriesData && p.seriesData.size > 0) {
-      const d = p.seriesData.get(h4Series);
-      if (d) updateOHLCInfo('h4info', d);
-    }
-  });
-
-  // Resize
-  window.addEventListener('resize', () => {
-    ['m15chart','m15vol','h4chart','h4vol'].forEach(id => {
-      const el = document.getElementById(id);
-      const w = el.offsetWidth;
-      if (id === 'm15chart') m15Chart.applyOptions({ width: w });
-      if (id === 'm15vol')   m15.volChart.applyOptions({ width: w });
-      if (id === 'h4chart')  h4Chart.applyOptions({ width: w });
-      if (id === 'h4vol')    h4.volChart.applyOptions({ width: w });
-    });
+    if (p.seriesData?.size) { const d = p.seriesData.get(h4Series);  if (d) showOHLC('h4info',  d); }
   });
 }
 
-// ── OHLC hover display ────────────────────────────────────
-function updateOHLCInfo(elId, d) {
-  const el = document.getElementById(elId);
+// ── OHLC display ──────────────────────────────────────────
+function showOHLC(elId, d) {
   const chg = d.close - d.open;
-  const chgPct = ((chg / d.open) * 100).toFixed(2);
-  const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
+  const pct  = ((chg / d.open) * 100).toFixed(2);
+  const clr  = chg >= 0 ? '#2ecc71' : '#e74c3c';
   const sign = chg >= 0 ? '+' : '';
-  el.innerHTML = `
-    <span class="o">O:${fmt(d.open)}</span>
-    <span class="h">H:${fmt(d.high)}</span>
-    <span class="l">L:${fmt(d.low)}</span>
-    <span class="c">C:${fmt(d.close)}</span>
-    <span style="color:${clr}">${sign}${fmt(chg)} (${sign}${chgPct}%)</span>
-  `;
+  document.getElementById(elId).innerHTML =
+    `<span class="o">O:${fmt(d.open)}</span>` +
+    `<span class="h">H:${fmt(d.high)}</span>` +
+    `<span class="l">L:${fmt(d.low)}</span>` +
+    `<span class="c">C:${fmt(d.close)}</span>` +
+    `<span style="color:${clr}">${sign}${fmt(chg)} (${sign}${pct}%)</span>`;
 }
 
-// ── Fetch candles ─────────────────────────────────────────
-async function fetchCandles(interval, count) {
-  const url = `https://api.twelvedata.com/time_series` +
-    `?symbol=XAU/USD&interval=${interval}&outputsize=${count}` +
-    `&timezone=UTC&apikey=${API_KEY}&format=JSON`;
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-
-  if (data.status === 'error') throw new Error(data.message || 'API error');
-  if (!data.values || !data.values.length) throw new Error('No data for ' + interval);
-
-  // Twelve Data returns newest-first — reverse for chart (oldest → newest)
-  return data.values.slice().reverse().map(v => ({
-    time:   Math.floor(new Date(v.datetime.replace(' ', 'T') + 'Z').getTime() / 1000),
-    open:   parseFloat(v.open),
-    high:   parseFloat(v.high),
-    low:    parseFloat(v.low),
-    close:  parseFloat(v.close),
-    volume: parseFloat(v.volume || 0),
-  }));
-}
-
-// ── Render candles into chart ─────────────────────────────
-function renderCandles(candleSeries, volSeries, data, countElId, lastElId, lastOhlcElId, infoElId) {
+// ── Render helpers ────────────────────────────────────────
+function renderChart(candleSeries, volSeries, chart, data, countId, lastId, lastOhlcId, infoId, isM15) {
   // Candles
-  const candles = data.map(d => ({
+  candleSeries.setData(data.map(d => ({
     time: d.time, open: d.open, high: d.high, low: d.low, close: d.close,
-  }));
-  candleSeries.setData(candles);
+  })));
 
-  // Volume bars (colored by candle direction)
-  const vols = data.map(d => ({
-    time:  d.time,
+  // Volume
+  volSeries.setData(data.map(d => ({
+    time: d.time,
     value: d.volume || 0,
-    color: d.close >= d.open ? '#2ecc7130' : '#e74c3c30',
-  }));
-  volSeries.setData(vols);
+    color: d.close >= d.open ? '#2ecc7128' : '#e74c3c28',
+  })));
 
-  // Last candle display
+  chart.timeScale().fitContent();
+
   const last = data[data.length - 1];
   if (!last) return;
 
-  const chg = last.close - last.open;
-  const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
-  const sign = chg >= 0 ? '+' : '';
+  const chg  = last.close - last.open;
+  const pct  = ((Math.abs(chg) / last.open) * 100).toFixed(2);
+  const clr  = chg >= 0 ? '#2ecc71' : '#e74c3c';
   const arrow = chg >= 0 ? '▲' : '▼';
+  const sign  = chg >= 0 ? '+' : '';
 
-  document.getElementById(lastElId).innerHTML =
+  document.getElementById(lastId).innerHTML =
     `${fmt(last.close)} <span style="font-size:12px;color:${clr}">${arrow} ${fmt(Math.abs(chg))}</span>`;
 
-  document.getElementById(lastOhlcElId).innerHTML =
+  document.getElementById(lastOhlcId).innerHTML =
     `<span>O:${fmt(last.open)}</span>` +
     `<span style="color:#2ecc71">H:${fmt(last.high)}</span>` +
     `<span style="color:#e74c3c">L:${fmt(last.low)}</span>` +
     `<span style="color:var(--gold-bright)">C:${fmt(last.close)}</span>` +
-    `<span style="color:${clr}">${sign}${fmt(chg)} (${sign}${(Math.abs(chg / last.open) * 100).toFixed(2)}%)</span>`;
+    `<span style="color:${clr}">${sign}${fmt(chg)} (${sign}${pct}%)</span>`;
 
-  // Update live price header from M15 last candle
-  if (lastElId === 'm15last') updateHeader(last);
+  document.getElementById(countId).textContent = data.length + ' candles';
 
-  // Update count badge
-  document.getElementById(countElId).textContent = data.length + ' candles';
+  showOHLC(infoId, last);
 
-  // Reset hover info to last candle
-  updateOHLCInfo(infoElId, last);
+  if (isM15) updateHeader(last);
 }
 
-// ── Header live price ─────────────────────────────────────
-let _prevClose = null;
-
+// ── Header price ──────────────────────────────────────────
 function updateHeader(last) {
-  const priceEl = document.getElementById('livePrice');
-  const changeEl = document.getElementById('priceChange');
+  const el = document.getElementById('livePrice');
+  el.textContent = fmt(last.close);
+  el.style.color = last.close >= last.open ? '#2ecc71' : '#e74c3c';
+  setTimeout(() => { el.style.color = 'var(--gold-bright)'; }, 700);
 
-  priceEl.textContent = fmt(last.close);
-
-  // Color flash
-  priceEl.style.transition = 'color 0.3s';
-  priceEl.style.color = last.close >= last.open ? '#2ecc71' : '#e74c3c';
-  setTimeout(() => { priceEl.style.color = 'var(--gold-bright)'; }, 800);
-
-  // Change vs candle open
-  const chg = last.close - last.open;
-  const chgPct = ((chg / last.open) * 100).toFixed(2);
+  const chg  = last.close - last.open;
+  const pct  = ((chg / last.open) * 100).toFixed(2);
   const sign = chg >= 0 ? '+' : '';
-  const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
-  changeEl.style.color = clr;
-  changeEl.textContent = `${sign}${fmt(chg)} (${sign}${chgPct}%) vs open`;
+  const clr  = chg >= 0 ? '#2ecc71' : '#e74c3c';
 
-  document.getElementById('updateTime').textContent =
-    'Updated ' + new Date().toLocaleTimeString('id-ID');
+  document.getElementById('priceChange').style.color = clr;
+  document.getElementById('priceChange').textContent = `${sign}${fmt(chg)} (${sign}${pct}%) vs candle open`;
+  document.getElementById('updateTime').textContent  = 'Updated ' + new Date().toLocaleTimeString('id-ID');
 }
 
-// ── Load M15 ──────────────────────────────────────────────
+// ── Fetch M15 ─────────────────────────────────────────────
 async function loadM15() {
-  try {
-    const data = await fetchCandles('15min', 100);
-    renderCandles(m15Series, m15VolSeries, data, 'm15count', 'm15last', 'm15lastOhlc', 'm15info');
-    m15Chart.timeScale().fitContent();
-  } catch (e) {
-    throw new Error('M15: ' + e.message);
-  }
+  // 15m interval, 5d range → ~100+ candles (market hours only)
+  const raw  = await fetchWithProxy(buildUrl('15m', '5d'));
+  const data = parseYahoo(raw, 100);
+  renderChart(m15Series, m15VolSeries, m15Chart, data, 'm15count', 'm15last', 'm15lastOhlc', 'm15info', true);
 }
 
-// ── Load H4 ───────────────────────────────────────────────
+// ── Fetch H4 ──────────────────────────────────────────────
 async function loadH4() {
-  try {
-    const data = await fetchCandles('4h', 50);
-    renderCandles(h4Series, h4VolSeries, data, 'h4count', 'h4last', 'h4lastOhlc', 'h4info');
-    h4Chart.timeScale().fitContent();
-  } catch (e) {
-    throw new Error('H4: ' + e.message);
-  }
+  // Yahoo has no 4h interval — fetch 1h/30d then group to 4h
+  const raw  = await fetchWithProxy(buildUrl('1h', '30d'));
+  const h1   = parseYahoo(raw, 9999);
+  const data = groupTo4H(h1).slice(-50);
+  renderChart(h4Series, h4VolSeries, h4Chart, data, 'h4count', 'h4last', 'h4lastOhlc', 'h4info', false);
 }
 
-// ── Full load (parallel) ──────────────────────────────────
-async function loadAll(isManual = false) {
-  const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  setStatus('loading', 'Mengambil data M15 & H4...');
+// ── Full parallel load ────────────────────────────────────
+async function loadAll() {
+  document.getElementById('refreshBtn').disabled = true;
+  setStatus('loading', 'Mengambil data dari Yahoo Finance...');
   setError('');
 
-  const errors = [];
-
-  const [m15Err, h4Err] = await Promise.all([
+  const [errM15, errH4] = await Promise.all([
     loadM15().catch(e => e),
     loadH4().catch(e => e),
   ]);
 
-  if (m15Err instanceof Error) errors.push(m15Err.message);
-  if (h4Err instanceof Error) errors.push(h4Err.message);
+  const errs = [errM15, errH4].filter(e => e instanceof Error).map(e => e.message);
 
-  if (errors.length === 2) {
-    setStatus('error', 'Gagal memuat data');
-    setError('❌ ' + errors.join(' | '));
-  } else if (errors.length === 1) {
-    setStatus('live', 'Sebagian data dimuat · ' + errors[0]);
-    setError('⚠ ' + errors[0]);
+  if (errs.length === 2) {
+    setStatus('error', 'Gagal mengambil data');
+    setError(
+      '❌ ' + errs.join(' | ') + '\n\n' +
+      'Yahoo Finance mungkin memblokir request dari browser ini.\n' +
+      'Coba buka di browser lain, atau periksa koneksi internet.'
+    );
+  } else if (errs.length === 1) {
+    setStatus('live', 'Sebagian data gagal: ' + errs[0]);
+    setError('⚠ ' + errs[0]);
   } else {
-    const now = new Date().toLocaleTimeString('id-ID');
-    setStatus('live', `Live · M15 × 100  H4 × 50 · ${now}`);
+    setStatus('live', 'Live · Yahoo Finance · ' + new Date().toLocaleTimeString('id-ID'));
   }
 
-  btn.disabled = false;
-
-  // Schedule next refreshes
-  scheduleRefreshes();
-}
-
-// ── Auto-refresh scheduler ────────────────────────────────
-function scheduleM15() {
-  clearTimeout(m15Timer);
-  m15NextAt = Date.now() + M15_INTERVAL_MS;
-  m15Timer = setTimeout(async () => {
-    setStatus('loading', 'Refresh M15...');
-    await loadM15().catch(e => setError('⚠ M15: ' + e.message));
-    setStatus('live', 'Live · M15 updated ' + new Date().toLocaleTimeString('id-ID'));
-    scheduleM15();
-  }, M15_INTERVAL_MS);
-}
-
-function scheduleH4() {
-  clearTimeout(h4Timer);
-  h4NextAt = Date.now() + H4_INTERVAL_MS;
-  h4Timer = setTimeout(async () => {
-    setStatus('loading', 'Refresh H4...');
-    await loadH4().catch(e => setError('⚠ H4: ' + e.message));
-    setStatus('live', 'Live · H4 updated ' + new Date().toLocaleTimeString('id-ID'));
-    scheduleH4();
-  }, H4_INTERVAL_MS);
-}
-
-function scheduleRefreshes() {
+  document.getElementById('refreshBtn').disabled = false;
   scheduleM15();
   scheduleH4();
 }
 
-// ── Countdown tick ────────────────────────────────────────
+// ── Schedulers (recursive setTimeout) ────────────────────
+function scheduleM15() {
+  clearTimeout(m15Timer);
+  m15NextAt = Date.now() + M15_REFRESH_MS;
+  m15Timer = setTimeout(async () => {
+    await loadM15().catch(e => setError('⚠ M15: ' + e.message));
+    setStatus('live', 'Live · M15 updated ' + new Date().toLocaleTimeString('id-ID'));
+    scheduleM15();
+  }, M15_REFRESH_MS);
+}
+
+function scheduleH4() {
+  clearTimeout(h4Timer);
+  h4NextAt = Date.now() + H4_REFRESH_MS;
+  h4Timer = setTimeout(async () => {
+    await loadH4().catch(e => setError('⚠ H4: ' + e.message));
+    setStatus('live', 'Live · H4 updated ' + new Date().toLocaleTimeString('id-ID'));
+    scheduleH4();
+  }, H4_REFRESH_MS);
+}
+
+// ── Countdown ticker ──────────────────────────────────────
 function startCountdown() {
   clearInterval(cdTick);
   cdTick = setInterval(() => {
     const now = Date.now();
-
     const m15rem = Math.max(0, m15NextAt - now);
     const h4rem  = Math.max(0, h4NextAt  - now);
 
     document.getElementById('m15cdText').textContent = fmtCountdown(m15rem);
     document.getElementById('h4cdText').textContent  = fmtCountdown(h4rem);
 
-    const m15pct = m15NextAt ? (1 - m15rem / M15_INTERVAL_MS) * 100 : 0;
-    const h4pct  = h4NextAt  ? (1 - h4rem  / H4_INTERVAL_MS)  * 100 : 0;
+    const m15pct = m15NextAt ? (1 - m15rem / M15_REFRESH_MS) * 100 : 0;
+    const h4pct  = h4NextAt  ? (1 - h4rem  / H4_REFRESH_MS)  * 100 : 0;
 
     document.getElementById('m15bar').style.width = Math.min(100, m15pct) + '%';
     document.getElementById('h4bar').style.width  = Math.min(100, h4pct)  + '%';
@@ -735,13 +693,13 @@ function startCountdown() {
 function manualRefresh() {
   clearTimeout(m15Timer);
   clearTimeout(h4Timer);
-  loadAll(true);
+  loadAll();
 }
 
 // ── Boot ──────────────────────────────────────────────────
 initCharts();
-loadAll();
 startCountdown();
+loadAll();
 </script>
 </body>
 </html>
