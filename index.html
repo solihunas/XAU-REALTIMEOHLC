@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAU/USD Chart</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0c0f;
+    --panel: #111318;
+    --border: #1e2330;
+    --gold: #c9a84c;
+    --gold-bright: #f0c040;
+    --gold-dim: #7a6130;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --text: #cdd3e0;
+    --muted: #4a5268;
+    --mono: 'Share Tech Mono', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap');
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 12px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .symbol {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--gold-bright);
+    letter-spacing: 2px;
+  }
+
+  .sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    margin-bottom: 10px;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .dot.live { background: var(--green); box-shadow: 0 0 4px var(--green); }
+  .dot.loading { background: var(--gold); animation: pulse 1s infinite; }
+  .dot.error { background: var(--red); }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; } 50% { opacity:0.3; }
+  }
+
+  /* Chart containers */
+  .chart-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tf-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  .ohlc-info {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+  }
+
+  .ohlc-info span { white-space: nowrap; }
+  .ohlc-info .o { color: var(--text); }
+  .ohlc-info .h { color: var(--green); }
+  .ohlc-info .l { color: var(--red); }
+  .ohlc-info .c { color: var(--gold-bright); }
+
+  .chart-box {
+    width: 100%;
+    height: 240px;
+  }
+
+  /* Last price pill */
+  .last-price {
+    padding: 4px 12px 8px;
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--gold-bright);
+  }
+
+  .last-price small {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .refresh-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    color: var(--gold);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .refresh-btn:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+  .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .note {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 8px;
+    font-family: var(--mono);
+  }
+
+  .error-box {
+    background: rgba(231,76,60,0.08);
+    border: 1px solid rgba(231,76,60,0.3);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 12px;
+    color: var(--red);
+    font-family: var(--mono);
+    margin-bottom: 10px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="symbol">XAU / USD</div>
+    <div class="sub">Gold Spot · Twelve Data</div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--muted)" id="updateTime">–</div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="dot loading" id="statusDot"></div>
+  <span id="statusText">Loading charts...</span>
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<!-- M15 Chart -->
+<div class="chart-section">
+  <div class="chart-header">
+    <div class="tf-label">M15 · 100 Candles</div>
+    <div class="ohlc-info" id="m15info">
+      <span>Hover candle untuk detail</span>
+    </div>
+  </div>
+  <div class="chart-box" id="m15chart"></div>
+  <div class="last-price" id="m15last">–</div>
+</div>
+
+<!-- H4 Chart -->
+<div class="chart-section">
+  <div class="chart-header">
+    <div class="tf-label">H4 · 50 Candles</div>
+    <div class="ohlc-info" id="h4info">
+      <span>Hover candle untuk detail</span>
+    </div>
+  </div>
+  <div class="chart-box" id="h4chart"></div>
+  <div class="last-price" id="h4last">–</div>
+</div>
+
+<button class="refresh-btn" id="refreshBtn" onclick="loadAll()">⟳ &nbsp;Refresh Data</button>
+<div class="note">Twelve Data · Basic 8 · 800 req/day · 2 req per refresh</div>
+
+<script>
+const API_KEY = '78bbb1cff5b947328967d98b25ed1ffd';
+
+// Chart instances
+let m15Chart, m15Series, h4Chart, h4Series;
+
+function fmt(n, d=2) {
+  return n != null ? Number(n).toFixed(d) : '–';
+}
+
+function setStatus(type, msg) {
+  document.getElementById('statusDot').className = 'dot ' + type;
+  document.getElementById('statusText').textContent = msg;
+}
+
+function setError(msg) {
+  const el = document.getElementById('errorBox');
+  el.style.display = msg ? 'block' : 'none';
+  el.textContent = msg;
+}
+
+function initCharts() {
+  const commonOpts = {
+    layout: {
+      background: { color: '#111318' },
+      textColor: '#4a5268',
+    },
+    grid: {
+      vertLines: { color: '#1a1e28' },
+      horzLines: { color: '#1a1e28' },
+    },
+    crosshair: {
+      mode: 1,
+      vertLine: { color: '#c9a84c44', labelBackgroundColor: '#c9a84c' },
+      horzLine: { color: '#c9a84c44', labelBackgroundColor: '#c9a84c' },
+    },
+    rightPriceScale: {
+      borderColor: '#1e2330',
+      textColor: '#4a5268',
+    },
+    timeScale: {
+      borderColor: '#1e2330',
+      timeVisible: true,
+      secondsVisible: false,
+    },
+    handleScroll: true,
+    handleScale: true,
+  };
+
+  const candleOpts = {
+    upColor: '#2ecc71',
+    downColor: '#e74c3c',
+    borderUpColor: '#2ecc71',
+    borderDownColor: '#e74c3c',
+    wickUpColor: '#2ecc71',
+    wickDownColor: '#e74c3c',
+  };
+
+  // M15
+  const m15El = document.getElementById('m15chart');
+  m15Chart = LightweightCharts.createChart(m15El, {
+    ...commonOpts,
+    width: m15El.offsetWidth,
+    height: 240,
+  });
+  m15Series = m15Chart.addCandlestickSeries(candleOpts);
+
+  // H4
+  const h4El = document.getElementById('h4chart');
+  h4Chart = LightweightCharts.createChart(h4El, {
+    ...commonOpts,
+    width: h4El.offsetWidth,
+    height: 240,
+  });
+  h4Series = h4Chart.addCandlestickSeries(candleOpts);
+
+  // Crosshair hover info
+  m15Chart.subscribeCrosshairMove(p => {
+    if (p.seriesData && p.seriesData.size > 0) {
+      const d = p.seriesData.get(m15Series);
+      if (d) updateOHLCInfo('m15info', d);
+    }
+  });
+
+  h4Chart.subscribeCrosshairMove(p => {
+    if (p.seriesData && p.seriesData.size > 0) {
+      const d = p.seriesData.get(h4Series);
+      if (d) updateOHLCInfo('h4info', d);
+    }
+  });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    m15Chart.applyOptions({ width: m15El.offsetWidth });
+    h4Chart.applyOptions({ width: h4El.offsetWidth });
+  });
+}
+
+function updateOHLCInfo(elId, d) {
+  const el = document.getElementById(elId);
+  const chg = d.close - d.open;
+  const chgPct = ((chg / d.open) * 100).toFixed(2);
+  const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
+  el.innerHTML = `
+    <span class="o">O: ${fmt(d.open)}</span>
+    <span class="h">H: ${fmt(d.high)}</span>
+    <span class="l">L: ${fmt(d.low)}</span>
+    <span class="c">C: ${fmt(d.close)}</span>
+    <span style="color:${clr}">${chg >= 0 ? '+' : ''}${fmt(chg)} (${chgPct}%)</span>
+  `;
+}
+
+async function fetchCandles(interval, count) {
+  const url = `https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=${interval}&outputsize=${count}&apikey=${API_KEY}&format=JSON`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (data.status === 'error') throw new Error(data.message);
+  if (!data.values || !data.values.length) throw new Error('No data returned for ' + interval);
+
+  // Twelve Data returns newest first — reverse for chart
+  return data.values.reverse().map(v => ({
+    time: Math.floor(new Date(v.datetime).getTime() / 1000),
+    open: parseFloat(v.open),
+    high: parseFloat(v.high),
+    low: parseFloat(v.low),
+    close: parseFloat(v.close),
+  }));
+}
+
+async function loadAll() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  setStatus('loading', 'Fetching M15 & H4 data...');
+  setError('');
+
+  try {
+    // Fetch M15 (100 candles) — request 1
+    setStatus('loading', 'Fetching M15 (100 candles)...');
+    const m15data = await fetchCandles('15min', 100);
+
+    // Fetch H4 (50 candles) — request 2
+    setStatus('loading', 'Fetching H4 (50 candles)...');
+    const h4data = await fetchCandles('4h', 50);
+
+    // Set data
+    m15Series.setData(m15data);
+    h4Series.setData(h4data);
+
+    m15Chart.timeScale().fitContent();
+    h4Chart.timeScale().fitContent();
+
+    // Last price display
+    const m15Last = m15data[m15data.length - 1];
+    const h4Last = h4data[h4data.length - 1];
+
+    const m15Chg = m15Last.close - m15Last.open;
+    const h4Chg = h4Last.close - h4Last.open;
+
+    document.getElementById('m15last').innerHTML =
+      `${fmt(m15Last.close)} <small style="color:${m15Chg >= 0 ? '#2ecc71' : '#e74c3c'}">${m15Chg >= 0 ? '▲' : '▼'} ${fmt(Math.abs(m15Chg))}</small>`;
+
+    document.getElementById('h4last').innerHTML =
+      `${fmt(h4Last.close)} <small style="color:${h4Chg >= 0 ? '#2ecc71' : '#e74c3c'}">${h4Chg >= 0 ? '▲' : '▼'} ${fmt(Math.abs(h4Chg))}</small>`;
+
+    // Update info bars
+    updateOHLCInfo('m15info', m15Last);
+    updateOHLCInfo('h4info', h4Last);
+
+    // Timestamp
+    const now = new Date();
+    document.getElementById('updateTime').textContent = now.toLocaleTimeString();
+
+    setStatus('live', `Loaded · M15: ${m15data.length} candles · H4: ${h4data.length} candles`);
+
+  } catch (err) {
+    setStatus('error', 'Failed');
+    setError(`❌ ${err.message}`);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Init
+initCharts();
+loadAll();
+</script>
+</body>
+</html>
