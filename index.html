@@ -1,232 +1,398 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XAU/USD Chart</title>
+<title>XAU/USD · Realtime OHLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
-    --bg: #0a0c0f;
-    --panel: #111318;
-    --border: #1e2330;
-    --gold: #c9a84c;
-    --gold-bright: #f0c040;
-    --gold-dim: #7a6130;
-    --green: #2ecc71;
-    --red: #e74c3c;
-    --text: #cdd3e0;
-    --muted: #4a5268;
-    --mono: 'Share Tech Mono', monospace;
-  }
+:root {
+  --bg:         #0a0c0f;
+  --panel:      #111318;
+  --panel2:     #13161d;
+  --border:     #1e2330;
+  --gold:       #c9a84c;
+  --gold-bright:#f0c040;
+  --gold-dim:   #7a6130;
+  --gold-glow:  rgba(201,168,76,0.12);
+  --green:      #2ecc71;
+  --red:        #e74c3c;
+  --text:       #cdd3e0;
+  --muted:      #4a5268;
+  --mono:       'Share Tech Mono', monospace;
+}
 
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap');
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    padding: 12px;
-  }
+/* ── Header ─────────────────────────────── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--gold-dim);
+  border-radius: 8px;
+}
 
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
+.symbol-block { display: flex; align-items: center; gap: 14px; }
 
-  .symbol {
-    font-family: var(--mono);
-    font-size: 16px;
-    color: var(--gold-bright);
-    letter-spacing: 2px;
-  }
+.gold-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #c9a84c, #f0c040, #c9a84c);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #0a0c0f;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(201,168,76,0.3);
+}
 
-  .sub {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
+.symbol { font-family: var(--mono); font-size: 18px; color: var(--gold-bright); letter-spacing: 2px; }
+.sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-  .status-bar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--muted);
-    font-family: var(--mono);
-    margin-bottom: 10px;
-  }
+.price-block { text-align: right; }
 
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--muted);
-  }
-  .dot.live { background: var(--green); box-shadow: 0 0 4px var(--green); }
-  .dot.loading { background: var(--gold); animation: pulse 1s infinite; }
-  .dot.error { background: var(--red); }
+#livePrice {
+  font-family: var(--mono);
+  font-size: 28px;
+  color: var(--gold-bright);
+  letter-spacing: 1px;
+  line-height: 1;
+}
 
-  @keyframes pulse {
-    0%,100% { opacity:1; } 50% { opacity:0.3; }
-  }
+#priceChange {
+  font-family: var(--mono);
+  font-size: 12px;
+  margin-top: 4px;
+}
 
-  /* Chart containers */
-  .chart-section {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-top: 2px solid var(--gold-dim);
-    border-radius: 6px;
-    margin-bottom: 10px;
-    overflow: hidden;
-  }
+/* ── Status bar ──────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+}
 
-  .chart-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-  }
+.status-left { display: flex; align-items: center; gap: 6px; }
 
-  .tf-label {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--gold);
-    letter-spacing: 1px;
-  }
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.dot.live    { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.dot.loading { background: var(--gold);  animation: pulse 0.9s ease-in-out infinite; }
+.dot.error   { background: var(--red); }
 
-  .ohlc-info {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    display: flex;
-    gap: 10px;
-  }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
-  .ohlc-info span { white-space: nowrap; }
-  .ohlc-info .o { color: var(--text); }
-  .ohlc-info .h { color: var(--green); }
-  .ohlc-info .l { color: var(--red); }
-  .ohlc-info .c { color: var(--gold-bright); }
+/* ── Error box ───────────────────────────── */
+.error-box {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--red);
+  font-family: var(--mono);
+  margin-bottom: 10px;
+  display: none;
+}
 
-  .chart-box {
-    width: 100%;
-    height: 240px;
-  }
+/* ── Chart sections ──────────────────────── */
+.chart-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--gold-dim);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
 
-  /* Last price pill */
-  .last-price {
-    padding: 4px 12px 8px;
-    font-family: var(--mono);
-    font-size: 18px;
-    color: var(--gold-bright);
-  }
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel2);
+}
 
-  .last-price small {
-    font-size: 11px;
-    color: var(--muted);
-    margin-left: 8px;
-  }
+.chart-header-left { display: flex; align-items: center; gap: 12px; }
 
-  .refresh-btn {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background: transparent;
-    border: 1px solid var(--gold-dim);
-    border-radius: 6px;
-    color: var(--gold);
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 2px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    margin-top: 4px;
-  }
-  .refresh-btn:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
-  .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.tf-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
 
-  .note {
-    text-align: center;
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 8px;
-    font-family: var(--mono);
-  }
+.candle-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
 
-  .error-box {
-    background: rgba(231,76,60,0.08);
-    border: 1px solid rgba(231,76,60,0.3);
-    border-radius: 6px;
-    padding: 12px;
-    font-size: 12px;
-    color: var(--red);
-    font-family: var(--mono);
-    margin-bottom: 10px;
-    display: none;
-  }
+.ohlc-info {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ohlc-info .o { color: var(--text); }
+.ohlc-info .h { color: var(--green); }
+.ohlc-info .l { color: var(--red); }
+.ohlc-info .c { color: var(--gold-bright); }
+
+/* Countdown badge */
+.countdown {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.countdown-bar-wrap {
+  width: 60px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.countdown-bar {
+  height: 100%;
+  background: var(--gold-dim);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
+/* Chart canvas */
+.chart-box { width: 100%; height: 250px; }
+
+/* Last price row */
+.last-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.last-price {
+  font-family: var(--mono);
+  font-size: 17px;
+  color: var(--gold-bright);
+}
+
+.last-ohlc {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Volume chart box */
+.vol-box { width: 100%; height: 60px; }
+
+/* ── Controls ────────────────────────────── */
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.refresh-btn {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.refresh-btn:hover:not(:disabled) { background: var(--gold-glow); border-color: var(--gold); }
+.refresh-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.note {
+  text-align: center;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-family: var(--mono);
+  line-height: 1.6;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 480px) {
+  #livePrice { font-size: 22px; }
+  .chart-box  { height: 200px; }
+  .vol-box    { height: 48px; }
+  .ohlc-info  { display: none; }
+}
 </style>
 </head>
 <body>
 
+<!-- ── Header ─────────────────────── -->
 <div class="header">
-  <div>
-    <div class="symbol">XAU / USD</div>
-    <div class="sub">Gold Spot · Twelve Data</div>
+  <div class="symbol-block">
+    <div class="gold-icon">Au</div>
+    <div>
+      <div class="symbol">XAU / USD</div>
+      <div class="sub">Gold Spot · Twelve Data · Auto-refresh</div>
+    </div>
   </div>
-  <div style="text-align:right;">
-    <div style="font-family:var(--mono);font-size:11px;color:var(--muted)" id="updateTime">–</div>
+  <div class="price-block">
+    <div id="livePrice">–</div>
+    <div id="priceChange" style="color:var(--muted)">– –</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px" id="updateTime">–</div>
   </div>
 </div>
 
+<!-- ── Status bar ─────────────────── -->
 <div class="status-bar">
-  <div class="dot loading" id="statusDot"></div>
-  <span id="statusText">Loading charts...</span>
+  <div class="status-left">
+    <div class="dot loading" id="statusDot"></div>
+    <span id="statusText">Initializing...</span>
+  </div>
+  <span id="apiInfo" style="font-size:10px">Twelve Data · Basic plan</span>
 </div>
 
+<!-- ── Error ──────────────────────── -->
 <div class="error-box" id="errorBox"></div>
 
-<!-- M15 Chart -->
+<!-- ── M15 Chart ──────────────────── -->
 <div class="chart-section">
   <div class="chart-header">
-    <div class="tf-label">M15 · 100 Candles</div>
-    <div class="ohlc-info" id="m15info">
-      <span>Hover candle untuk detail</span>
+    <div class="chart-header-left">
+      <div class="tf-label">M15</div>
+      <div class="candle-count" id="m15count">100 candles</div>
+      <div class="ohlc-info" id="m15info"><span style="color:var(--muted)">Arahkan ke candle</span></div>
+    </div>
+    <div class="countdown" id="m15countdown">
+      <span id="m15cdText">–</span>
+      <div class="countdown-bar-wrap"><div class="countdown-bar" id="m15bar" style="width:100%"></div></div>
     </div>
   </div>
   <div class="chart-box" id="m15chart"></div>
-  <div class="last-price" id="m15last">–</div>
+  <div class="vol-box" id="m15vol"></div>
+  <div class="last-row">
+    <div class="last-price" id="m15last">–</div>
+    <div class="last-ohlc" id="m15lastOhlc"></div>
+  </div>
 </div>
 
-<!-- H4 Chart -->
+<!-- ── H4 Chart ───────────────────── -->
 <div class="chart-section">
   <div class="chart-header">
-    <div class="tf-label">H4 · 50 Candles</div>
-    <div class="ohlc-info" id="h4info">
-      <span>Hover candle untuk detail</span>
+    <div class="chart-header-left">
+      <div class="tf-label">H4</div>
+      <div class="candle-count" id="h4count">50 candles</div>
+      <div class="ohlc-info" id="h4info"><span style="color:var(--muted)">Arahkan ke candle</span></div>
+    </div>
+    <div class="countdown" id="h4countdown">
+      <span id="h4cdText">–</span>
+      <div class="countdown-bar-wrap"><div class="countdown-bar" id="h4bar" style="width:100%"></div></div>
     </div>
   </div>
   <div class="chart-box" id="h4chart"></div>
-  <div class="last-price" id="h4last">–</div>
+  <div class="vol-box" id="h4vol"></div>
+  <div class="last-row">
+    <div class="last-price" id="h4last">–</div>
+    <div class="last-ohlc" id="h4lastOhlc"></div>
+  </div>
 </div>
 
-<button class="refresh-btn" id="refreshBtn" onclick="loadAll()">⟳ &nbsp;Refresh Data</button>
-<div class="note">Twelve Data · Basic 8 · 800 req/day · 2 req per refresh</div>
+<!-- ── Controls ───────────────────── -->
+<div class="controls">
+  <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()">&#8635; &nbsp;Refresh Sekarang</button>
+</div>
+<div class="note">
+  Twelve Data · Basic · 800 req/day &nbsp;|&nbsp; M15 refresh: 3 menit &nbsp;|&nbsp; H4 refresh: 30 menit<br>
+  Data mungkin delay 15 menit pada plan gratis
+</div>
 
 <script>
-const API_KEY = '78bbb1cff5b947328967d98b25ed1ffd';
+// ── Config ────────────────────────────────────────────────
+const API_KEY    = '78bbb1cff5b947328967d98b25ed1ffd';
+const M15_INTERVAL_MS = 3  * 60 * 1000;  // 3 minutes
+const H4_INTERVAL_MS  = 30 * 60 * 1000;  // 30 minutes
 
-// Chart instances
-let m15Chart, m15Series, h4Chart, h4Series;
+// ── State ─────────────────────────────────────────────────
+let m15Chart, m15Series, m15VolSeries;
+let h4Chart,  h4Series,  h4VolSeries;
+let m15Timer, h4Timer;
+let m15NextAt = 0, h4NextAt = 0;
+let cdTick;
 
-function fmt(n, d=2) {
+// ── Helpers ───────────────────────────────────────────────
+function fmt(n, d = 2) {
   return n != null ? Number(n).toFixed(d) : '–';
+}
+
+function fmtTime(ts) {
+  return new Date(ts * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtDateTime(ts) {
+  return new Date(ts * 1000).toLocaleString('id-ID', {
+    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function fmtCountdown(ms) {
+  if (ms <= 0) return '00:00';
+  const s = Math.ceil(ms / 1000);
+  const m = Math.floor(s / 60);
+  const ss = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
 }
 
 function setStatus(type, msg) {
@@ -240,20 +406,26 @@ function setError(msg) {
   el.textContent = msg;
 }
 
-function initCharts() {
-  const commonOpts = {
+// ── Chart init ────────────────────────────────────────────
+function makeChart(elId, volElId) {
+  const el = document.getElementById(elId);
+  const vEl = document.getElementById(volElId);
+
+  const chart = LightweightCharts.createChart(el, {
+    width: el.offsetWidth,
+    height: 250,
     layout: {
       background: { color: '#111318' },
       textColor: '#4a5268',
     },
     grid: {
-      vertLines: { color: '#1a1e28' },
-      horzLines: { color: '#1a1e28' },
+      vertLines: { color: '#15192200' },
+      horzLines: { color: '#1a1e2870' },
     },
     crosshair: {
       mode: 1,
-      vertLine: { color: '#c9a84c44', labelBackgroundColor: '#c9a84c' },
-      horzLine: { color: '#c9a84c44', labelBackgroundColor: '#c9a84c' },
+      vertLine: { color: '#c9a84c55', labelBackgroundColor: '#c9a84c' },
+      horzLine: { color: '#c9a84c55', labelBackgroundColor: '#c9a84c' },
     },
     rightPriceScale: {
       borderColor: '#1e2330',
@@ -263,46 +435,67 @@ function initCharts() {
       borderColor: '#1e2330',
       timeVisible: true,
       secondsVisible: false,
+      fixLeftEdge: false,
     },
     handleScroll: true,
     handleScale: true,
-  };
-
-  const candleOpts = {
-    upColor: '#2ecc71',
-    downColor: '#e74c3c',
-    borderUpColor: '#2ecc71',
-    borderDownColor: '#e74c3c',
-    wickUpColor: '#2ecc71',
-    wickDownColor: '#e74c3c',
-  };
-
-  // M15
-  const m15El = document.getElementById('m15chart');
-  m15Chart = LightweightCharts.createChart(m15El, {
-    ...commonOpts,
-    width: m15El.offsetWidth,
-    height: 240,
   });
-  m15Series = m15Chart.addCandlestickSeries(candleOpts);
 
-  // H4
-  const h4El = document.getElementById('h4chart');
-  h4Chart = LightweightCharts.createChart(h4El, {
-    ...commonOpts,
-    width: h4El.offsetWidth,
-    height: 240,
+  const candleSeries = chart.addCandlestickSeries({
+    upColor:        '#2ecc71',
+    downColor:      '#e74c3c',
+    borderUpColor:  '#2ecc71',
+    borderDownColor:'#e74c3c',
+    wickUpColor:    '#2ecc71',
+    wickDownColor:  '#e74c3c',
   });
-  h4Series = h4Chart.addCandlestickSeries(candleOpts);
 
-  // Crosshair hover info
+  // Volume chart
+  const volChart = LightweightCharts.createChart(vEl, {
+    width: vEl.offsetWidth,
+    height: 60,
+    layout: { background: { color: '#111318' }, textColor: 'transparent' },
+    grid: { vertLines: { color: 'transparent' }, horzLines: { color: 'transparent' } },
+    rightPriceScale: { visible: false },
+    leftPriceScale:  { visible: false },
+    timeScale: { visible: false },
+    crosshair: { horzLine: { visible: false }, vertLine: { visible: false } },
+    handleScroll: false,
+    handleScale: false,
+  });
+
+  const volSeries = volChart.addHistogramSeries({
+    color: '#c9a84c30',
+    priceFormat: { type: 'volume' },
+    priceScaleId: '',
+  });
+  volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.1, bottom: 0 } });
+
+  // Sync vol chart scroll/scale with main chart
+  chart.timeScale().subscribeVisibleTimeRangeChange(() => {
+    try {
+      const range = chart.timeScale().getVisibleRange();
+      if (range) volChart.timeScale().setVisibleRange(range);
+    } catch (_) {}
+  });
+
+  return { chart, candleSeries, volSeries, volChart, el, vEl };
+}
+
+function initCharts() {
+  const m15 = makeChart('m15chart', 'm15vol');
+  m15Chart = m15.chart; m15Series = m15.candleSeries; m15VolSeries = m15.volSeries;
+
+  const h4 = makeChart('h4chart', 'h4vol');
+  h4Chart = h4.chart; h4Series = h4.candleSeries; h4VolSeries = h4.volSeries;
+
+  // OHLC hover
   m15Chart.subscribeCrosshairMove(p => {
     if (p.seriesData && p.seriesData.size > 0) {
       const d = p.seriesData.get(m15Series);
       if (d) updateOHLCInfo('m15info', d);
     }
   });
-
   h4Chart.subscribeCrosshairMove(p => {
     if (p.seriesData && p.seriesData.size > 0) {
       const d = p.seriesData.get(h4Series);
@@ -312,100 +505,243 @@ function initCharts() {
 
   // Resize
   window.addEventListener('resize', () => {
-    m15Chart.applyOptions({ width: m15El.offsetWidth });
-    h4Chart.applyOptions({ width: h4El.offsetWidth });
+    ['m15chart','m15vol','h4chart','h4vol'].forEach(id => {
+      const el = document.getElementById(id);
+      const w = el.offsetWidth;
+      if (id === 'm15chart') m15Chart.applyOptions({ width: w });
+      if (id === 'm15vol')   m15.volChart.applyOptions({ width: w });
+      if (id === 'h4chart')  h4Chart.applyOptions({ width: w });
+      if (id === 'h4vol')    h4.volChart.applyOptions({ width: w });
+    });
   });
 }
 
+// ── OHLC hover display ────────────────────────────────────
 function updateOHLCInfo(elId, d) {
   const el = document.getElementById(elId);
   const chg = d.close - d.open;
   const chgPct = ((chg / d.open) * 100).toFixed(2);
   const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
+  const sign = chg >= 0 ? '+' : '';
   el.innerHTML = `
-    <span class="o">O: ${fmt(d.open)}</span>
-    <span class="h">H: ${fmt(d.high)}</span>
-    <span class="l">L: ${fmt(d.low)}</span>
-    <span class="c">C: ${fmt(d.close)}</span>
-    <span style="color:${clr}">${chg >= 0 ? '+' : ''}${fmt(chg)} (${chgPct}%)</span>
+    <span class="o">O:${fmt(d.open)}</span>
+    <span class="h">H:${fmt(d.high)}</span>
+    <span class="l">L:${fmt(d.low)}</span>
+    <span class="c">C:${fmt(d.close)}</span>
+    <span style="color:${clr}">${sign}${fmt(chg)} (${sign}${chgPct}%)</span>
   `;
 }
 
+// ── Fetch candles ─────────────────────────────────────────
 async function fetchCandles(interval, count) {
-  const url = `https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=${interval}&outputsize=${count}&apikey=${API_KEY}&format=JSON`;
+  const url = `https://api.twelvedata.com/time_series` +
+    `?symbol=XAU/USD&interval=${interval}&outputsize=${count}` +
+    `&timezone=UTC&apikey=${API_KEY}&format=JSON`;
+
   const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
 
-  if (data.status === 'error') throw new Error(data.message);
-  if (!data.values || !data.values.length) throw new Error('No data returned for ' + interval);
+  if (data.status === 'error') throw new Error(data.message || 'API error');
+  if (!data.values || !data.values.length) throw new Error('No data for ' + interval);
 
-  // Twelve Data returns newest first — reverse for chart
-  return data.values.reverse().map(v => ({
-    time: Math.floor(new Date(v.datetime).getTime() / 1000),
-    open: parseFloat(v.open),
-    high: parseFloat(v.high),
-    low: parseFloat(v.low),
-    close: parseFloat(v.close),
+  // Twelve Data returns newest-first — reverse for chart (oldest → newest)
+  return data.values.slice().reverse().map(v => ({
+    time:   Math.floor(new Date(v.datetime.replace(' ', 'T') + 'Z').getTime() / 1000),
+    open:   parseFloat(v.open),
+    high:   parseFloat(v.high),
+    low:    parseFloat(v.low),
+    close:  parseFloat(v.close),
+    volume: parseFloat(v.volume || 0),
   }));
 }
 
-async function loadAll() {
-  const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  setStatus('loading', 'Fetching M15 & H4 data...');
-  setError('');
+// ── Render candles into chart ─────────────────────────────
+function renderCandles(candleSeries, volSeries, data, countElId, lastElId, lastOhlcElId, infoElId) {
+  // Candles
+  const candles = data.map(d => ({
+    time: d.time, open: d.open, high: d.high, low: d.low, close: d.close,
+  }));
+  candleSeries.setData(candles);
 
+  // Volume bars (colored by candle direction)
+  const vols = data.map(d => ({
+    time:  d.time,
+    value: d.volume || 0,
+    color: d.close >= d.open ? '#2ecc7130' : '#e74c3c30',
+  }));
+  volSeries.setData(vols);
+
+  // Last candle display
+  const last = data[data.length - 1];
+  if (!last) return;
+
+  const chg = last.close - last.open;
+  const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
+  const sign = chg >= 0 ? '+' : '';
+  const arrow = chg >= 0 ? '▲' : '▼';
+
+  document.getElementById(lastElId).innerHTML =
+    `${fmt(last.close)} <span style="font-size:12px;color:${clr}">${arrow} ${fmt(Math.abs(chg))}</span>`;
+
+  document.getElementById(lastOhlcElId).innerHTML =
+    `<span>O:${fmt(last.open)}</span>` +
+    `<span style="color:#2ecc71">H:${fmt(last.high)}</span>` +
+    `<span style="color:#e74c3c">L:${fmt(last.low)}</span>` +
+    `<span style="color:var(--gold-bright)">C:${fmt(last.close)}</span>` +
+    `<span style="color:${clr}">${sign}${fmt(chg)} (${sign}${(Math.abs(chg / last.open) * 100).toFixed(2)}%)</span>`;
+
+  // Update live price header from M15 last candle
+  if (lastElId === 'm15last') updateHeader(last);
+
+  // Update count badge
+  document.getElementById(countElId).textContent = data.length + ' candles';
+
+  // Reset hover info to last candle
+  updateOHLCInfo(infoElId, last);
+}
+
+// ── Header live price ─────────────────────────────────────
+let _prevClose = null;
+
+function updateHeader(last) {
+  const priceEl = document.getElementById('livePrice');
+  const changeEl = document.getElementById('priceChange');
+
+  priceEl.textContent = fmt(last.close);
+
+  // Color flash
+  priceEl.style.transition = 'color 0.3s';
+  priceEl.style.color = last.close >= last.open ? '#2ecc71' : '#e74c3c';
+  setTimeout(() => { priceEl.style.color = 'var(--gold-bright)'; }, 800);
+
+  // Change vs candle open
+  const chg = last.close - last.open;
+  const chgPct = ((chg / last.open) * 100).toFixed(2);
+  const sign = chg >= 0 ? '+' : '';
+  const clr = chg >= 0 ? '#2ecc71' : '#e74c3c';
+  changeEl.style.color = clr;
+  changeEl.textContent = `${sign}${fmt(chg)} (${sign}${chgPct}%) vs open`;
+
+  document.getElementById('updateTime').textContent =
+    'Updated ' + new Date().toLocaleTimeString('id-ID');
+}
+
+// ── Load M15 ──────────────────────────────────────────────
+async function loadM15() {
   try {
-    // Fetch M15 (100 candles) — request 1
-    setStatus('loading', 'Fetching M15 (100 candles)...');
-    const m15data = await fetchCandles('15min', 100);
-
-    // Fetch H4 (50 candles) — request 2
-    setStatus('loading', 'Fetching H4 (50 candles)...');
-    const h4data = await fetchCandles('4h', 50);
-
-    // Set data
-    m15Series.setData(m15data);
-    h4Series.setData(h4data);
-
+    const data = await fetchCandles('15min', 100);
+    renderCandles(m15Series, m15VolSeries, data, 'm15count', 'm15last', 'm15lastOhlc', 'm15info');
     m15Chart.timeScale().fitContent();
-    h4Chart.timeScale().fitContent();
-
-    // Last price display
-    const m15Last = m15data[m15data.length - 1];
-    const h4Last = h4data[h4data.length - 1];
-
-    const m15Chg = m15Last.close - m15Last.open;
-    const h4Chg = h4Last.close - h4Last.open;
-
-    document.getElementById('m15last').innerHTML =
-      `${fmt(m15Last.close)} <small style="color:${m15Chg >= 0 ? '#2ecc71' : '#e74c3c'}">${m15Chg >= 0 ? '▲' : '▼'} ${fmt(Math.abs(m15Chg))}</small>`;
-
-    document.getElementById('h4last').innerHTML =
-      `${fmt(h4Last.close)} <small style="color:${h4Chg >= 0 ? '#2ecc71' : '#e74c3c'}">${h4Chg >= 0 ? '▲' : '▼'} ${fmt(Math.abs(h4Chg))}</small>`;
-
-    // Update info bars
-    updateOHLCInfo('m15info', m15Last);
-    updateOHLCInfo('h4info', h4Last);
-
-    // Timestamp
-    const now = new Date();
-    document.getElementById('updateTime').textContent = now.toLocaleTimeString();
-
-    setStatus('live', `Loaded · M15: ${m15data.length} candles · H4: ${h4data.length} candles`);
-
-  } catch (err) {
-    setStatus('error', 'Failed');
-    setError(`❌ ${err.message}`);
-    console.error(err);
-  } finally {
-    btn.disabled = false;
+  } catch (e) {
+    throw new Error('M15: ' + e.message);
   }
 }
 
-// Init
+// ── Load H4 ───────────────────────────────────────────────
+async function loadH4() {
+  try {
+    const data = await fetchCandles('4h', 50);
+    renderCandles(h4Series, h4VolSeries, data, 'h4count', 'h4last', 'h4lastOhlc', 'h4info');
+    h4Chart.timeScale().fitContent();
+  } catch (e) {
+    throw new Error('H4: ' + e.message);
+  }
+}
+
+// ── Full load (parallel) ──────────────────────────────────
+async function loadAll(isManual = false) {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  setStatus('loading', 'Mengambil data M15 & H4...');
+  setError('');
+
+  const errors = [];
+
+  const [m15Err, h4Err] = await Promise.all([
+    loadM15().catch(e => e),
+    loadH4().catch(e => e),
+  ]);
+
+  if (m15Err instanceof Error) errors.push(m15Err.message);
+  if (h4Err instanceof Error) errors.push(h4Err.message);
+
+  if (errors.length === 2) {
+    setStatus('error', 'Gagal memuat data');
+    setError('❌ ' + errors.join(' | '));
+  } else if (errors.length === 1) {
+    setStatus('live', 'Sebagian data dimuat · ' + errors[0]);
+    setError('⚠ ' + errors[0]);
+  } else {
+    const now = new Date().toLocaleTimeString('id-ID');
+    setStatus('live', `Live · M15 × 100  H4 × 50 · ${now}`);
+  }
+
+  btn.disabled = false;
+
+  // Schedule next refreshes
+  scheduleRefreshes();
+}
+
+// ── Auto-refresh scheduler ────────────────────────────────
+function scheduleM15() {
+  clearTimeout(m15Timer);
+  m15NextAt = Date.now() + M15_INTERVAL_MS;
+  m15Timer = setTimeout(async () => {
+    setStatus('loading', 'Refresh M15...');
+    await loadM15().catch(e => setError('⚠ M15: ' + e.message));
+    setStatus('live', 'Live · M15 updated ' + new Date().toLocaleTimeString('id-ID'));
+    scheduleM15();
+  }, M15_INTERVAL_MS);
+}
+
+function scheduleH4() {
+  clearTimeout(h4Timer);
+  h4NextAt = Date.now() + H4_INTERVAL_MS;
+  h4Timer = setTimeout(async () => {
+    setStatus('loading', 'Refresh H4...');
+    await loadH4().catch(e => setError('⚠ H4: ' + e.message));
+    setStatus('live', 'Live · H4 updated ' + new Date().toLocaleTimeString('id-ID'));
+    scheduleH4();
+  }, H4_INTERVAL_MS);
+}
+
+function scheduleRefreshes() {
+  scheduleM15();
+  scheduleH4();
+}
+
+// ── Countdown tick ────────────────────────────────────────
+function startCountdown() {
+  clearInterval(cdTick);
+  cdTick = setInterval(() => {
+    const now = Date.now();
+
+    const m15rem = Math.max(0, m15NextAt - now);
+    const h4rem  = Math.max(0, h4NextAt  - now);
+
+    document.getElementById('m15cdText').textContent = fmtCountdown(m15rem);
+    document.getElementById('h4cdText').textContent  = fmtCountdown(h4rem);
+
+    const m15pct = m15NextAt ? (1 - m15rem / M15_INTERVAL_MS) * 100 : 0;
+    const h4pct  = h4NextAt  ? (1 - h4rem  / H4_INTERVAL_MS)  * 100 : 0;
+
+    document.getElementById('m15bar').style.width = Math.min(100, m15pct) + '%';
+    document.getElementById('h4bar').style.width  = Math.min(100, h4pct)  + '%';
+  }, 1000);
+}
+
+// ── Manual refresh ────────────────────────────────────────
+function manualRefresh() {
+  clearTimeout(m15Timer);
+  clearTimeout(h4Timer);
+  loadAll(true);
+}
+
+// ── Boot ──────────────────────────────────────────────────
 initCharts();
 loadAll();
+startCountdown();
 </script>
 </body>
 </html>
